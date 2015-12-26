@@ -2,7 +2,7 @@ from BlinkyTape import BlinkyTape
 import time
 
 #bb = BlinkyTape('/dev/tty.usbmodemfa131')
-bb = BlinkyTape('COM8')
+bb = BlinkyTape('COM5')
 
 while True:
 
