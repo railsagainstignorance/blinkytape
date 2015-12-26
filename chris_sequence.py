@@ -1,9 +1,14 @@
 from BlinkyTape import BlinkyTape
 import time
+import os.path
 
-#bb = BlinkyTape('/dev/ttyACM0')
-bb = BlinkyTape('COM5')
-led_count = 60
+linux_port   = '/dev/ttyACM0'
+windows_port = 'COM5'
+
+port = linux_port if os.path.exists( linux_port ) else windows_port
+bb   = BlinkyTape(port)
+
+led_count     = 60
 pixel_full_on = [100, 100, 100]
 pixel_off     = [0, 0, 0]
 
