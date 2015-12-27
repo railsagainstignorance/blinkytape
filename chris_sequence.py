@@ -11,7 +11,7 @@ bb   = BlinkyTape(port)
 
 led_count     = 60
 rgb_max       = 100
-pixel_full_on = [100, 100, 100]
+pixel_half_on = [100, 100, 100]
 pixel_off     = [0, 0, 0]
 
 def clear_all():
@@ -19,16 +19,42 @@ def clear_all():
 		bb.sendPixel(0, 0, 0)
 	bb.show()
 
-clear_all()
+def shuttle_extend(n=1):
+	for i in range(n):
+		clear_all()
+		for s in range(led_count):
+			pixel_random_on = [randint(0,rgb_max), randint(0,rgb_max), randint(0,rgb_max)]
+			for t in range(s+1):
+				pixel_list = map(lambda x: pixel_random_on if x<=t else pixel_off, range(led_count))
+				bb.send_list(pixel_list)
+
+	#		pixel_random_on = [randint(0,rgb_max), randint(0,rgb_max), randint(0,rgb_max)]
+			for t in range(s, -1, -1):
+				pixel_list = map(lambda x: pixel_random_on if x<=t else pixel_off, range(led_count))
+				bb.send_list(pixel_list)
+	clear_all()
+
+def kitt_eye_pixel(x,w,s):
+	return pixel_half_on if (x>=s and x<(s+w)) else pixel_off
+
+def kitt_eye(w=5):
+	clear_all()
+	for s in range(led_count-w):
+		pixel_list = map(lambda x: kitt_eye_pixel(x,w,s), range(led_count))
+		bb.send_list(pixel_list)
+
+	for s in range(led_count-w, -1, -1):
+		pixel_list = map(lambda x: kitt_eye_pixel(x,w,s), range(led_count))
+		bb.send_list(pixel_list)
+	clear_all()
+
+def kitt_eye_sequence():
+	for s in range(led_count -1):
+		kitt_eye(led_count - s)
+
+	for s in range(led_count -1, -1, -1):
+		kitt_eye(led_count - s)
+
 while True:
-
-	for s in range(led_count):
-		pixel_random_on = [randint(0,rgb_max), randint(0,rgb_max), randint(0,rgb_max)]
-		for t in range(s+1):
-			pixel_list = map(lambda x: pixel_random_on if x<=t else pixel_off, range(led_count))
-			bb.send_list(pixel_list)
-
-#		pixel_random_on = [randint(0,rgb_max), randint(0,rgb_max), randint(0,rgb_max)]
-		for t in range(s, -1, -1):
-			pixel_list = map(lambda x: pixel_random_on if x<=t else pixel_off, range(led_count))
-			bb.send_list(pixel_list)
+	shuttle_extend()
+	kitt_eye_sequence()
