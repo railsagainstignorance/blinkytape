@@ -28,7 +28,7 @@ while True:
 			pixel_list = map(lambda x: pixel_random_on if x<=t else pixel_off, range(led_count))
 			bb.send_list(pixel_list)
 
-		pixel_random_on = [randint(0,rgb_max), randint(0,rgb_max), randint(0,rgb_max)]
+#		pixel_random_on = [randint(0,rgb_max), randint(0,rgb_max), randint(0,rgb_max)]
 		for t in range(s, -1, -1):
 			pixel_list = map(lambda x: pixel_random_on if x<=t else pixel_off, range(led_count))
 			bb.send_list(pixel_list)
