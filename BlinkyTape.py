@@ -26,8 +26,10 @@ else:
 
 
 class BlinkyTape(object):
-    linux_port   = '/dev/ttyACM0'
-    windows_port = 'COM5'
+    linux_port     = '/dev/ttyACM0'
+    windows_port   = 'COM5'
+    min_colour_val = 0
+    max_colour_val = 254
 
     def __init__(self, port=None, ledCount=60, buffered=True):
         """Creates a BlinkyTape object and opens the port.
@@ -72,16 +74,17 @@ class BlinkyTape(object):
             self.sendPixel(r, g, b)
         self.show()
 
+    def colour_chr(self, n):
+        if n < self.min_colour_val:
+            n = self.min_colour_val
+        elif n > self.max_colour_val:
+            n = self.max_colour_val
+        return chr(n)
+
     def send_list(self, colors):
         data = ""
         for r, g, b in colors:
-            if r >= 255:
-                r = 254
-            if g >= 255:
-                g = 254
-            if b >= 255:
-                b = 254
-            data += chr(r) + chr(g) + chr(b)
+            data += self.colour_chr(r) + self.colour_chr(g) + self.colour_chr(b)
         self.serial.write(encode(data))
         self.show()
 
@@ -92,20 +95,7 @@ class BlinkyTape(object):
 
         Throws a RuntimeException if [ledCount] pixels are already set.
         """
-        data = ""
-        if r < 0:
-            r = 0
-        if g < 0:
-            g = 0
-        if b < 0:
-            b = 0
-        if r >= 255:
-            r = 254
-        if g >= 255:
-            g = 254
-        if b >= 255:
-            b = 254
-        data = chr(r) + chr(g) + chr(b)
+        data = self.colour_chr(r) + self.colour_chr(g) + self.colour_chr(b)
         if self.position < self.ledCount:
             if self.buffered:
                 self.buf += data
