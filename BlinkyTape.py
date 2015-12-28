@@ -149,6 +149,11 @@ class BlinkyTape(object):
         """Safely closes the serial port."""
         self.serial.close()
 
+    def clear_all(self):
+        for x in range(self.ledCount):
+            self.sendPixel(0, 0, 0)
+        self.show()
+
 
 # Example code
 
