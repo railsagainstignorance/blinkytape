@@ -12,6 +12,7 @@
 """
 
 import serial
+import os.path
 
 # For Python3 support- always run strings through a bytes converter
 import sys
@@ -25,7 +26,10 @@ else:
 
 
 class BlinkyTape(object):
-    def __init__(self, port, ledCount=60, buffered=True):
+    linux_port   = '/dev/ttyACM0'
+    windows_port = 'COM5'
+
+    def __init__(self, port=None, ledCount=60, buffered=True):
         """Creates a BlinkyTape object and opens the port.
 
         Parameters:
@@ -45,13 +49,21 @@ class BlinkyTape(object):
             with immediate flush of the serial buffers (slower).
 
         """
-        self.port = port
+        self.port = self.__identify_port(port)
         self.ledCount = ledCount
         self.position = 0
         self.buffered = buffered
         self.buf = ""
-        self.serial = serial.Serial(port, 115200)
+        self.serial = serial.Serial(self.port, 115200)
         self.show()  # Flush any incomplete data
+
+    def __identify_port(self, port=None):
+        if port is not None:
+            return port
+        elif os.path.exists( self.linux_port ):
+            return self.linux_port
+        else: 
+            return self.windows_port
 
     def send_list(self, colors):
         if len(colors) > self.ledCount:

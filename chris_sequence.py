@@ -1,13 +1,8 @@
 from BlinkyTape import BlinkyTape
 import time
-import os.path
 from random import randint
 
-linux_port   = '/dev/ttyACM0'
-windows_port = 'COM5'
-
-port = linux_port if os.path.exists( linux_port ) else windows_port
-bb   = BlinkyTape(port)
+bb   = BlinkyTape()
 
 led_count     = 60
 rgb_max       = 100
