@@ -69,7 +69,61 @@ def impulse():
 		pixel_list = map(lambda x: pixel_half_on if (led_count-int(h))==x else pixel_off, range(led_count))
 		bb.send_list(pixel_list)
 
+def multiple_impulses():
+	bb.clear_all()
+	v0 = 0.5 # keep v < 1.0
+	h0 = 0
+	max_h = 60
+	g  = -0.0025
+	cor = 0.99	
+	line = 	[None] * led_count # [ None, None, [vel, height], None, None, [vel, height], ...]
+	line[0] = [v0, h0]
+	line[led_count -1] = [0,led_count -1]
+
+	skip_next = False
+	while True:
+		for i in range(len(line)):
+			if line[i] is None or skip_next:
+				skip_next = False
+			else:
+				v = line[i][0]
+				h = line[i][1]
+				h = h + v
+				v = v + g
+				if h<0:
+					v = -v * cor
+					h = h + v
+					v = v + g
+				elif h>max_h:
+					v = 0
+					h = max_h
+				elif int(h) == i:
+					do="nothing"	# stay in same pixel
+				elif (int(h) != i) and (line[int(h)] is not None):
+					other_i = int(h)
+					h = h - v # remove prev vel contrib to ensure stay in same pixel
+					# swap vels
+					temp_v = line[other_i][0]
+					line[other_i][0] = v
+					v = temp_v
+
+				vh = [v,h]
+				if int(h) == i:
+					line[i] = vh
+				elif int(h) < i:
+					line[i-1] = vh
+					line[i] = None
+				else:
+					line[i+1] = vh
+					line[i] = None
+					skip_next = True
+
+		pixel_list = map(lambda x: pixel_half_on if (x is not None) else pixel_off, reversed(line))
+		bb.send_list(pixel_list)
+			
+
 while True:
+	multiple_impulses()
 	impulse()
 	shuttle_extend()
 	kitt_eye_sequence()
