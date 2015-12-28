@@ -77,9 +77,14 @@ def multiple_impulses():
 	g  = -0.0025
 	cor = 0.99	
 	line = 	[None] * led_count # [ None, None, [vel, height], None, None, [vel, height], ...]
-	line[0] = [v0, h0]
-	line[led_count -1] = [0,led_count -1]
-	line[10] = [0,10]
+	# line[0] = [v0, h0]
+	# line[led_count -1] = [0,led_count -1]
+	# line[10] = [0,10]
+
+	for x in xrange(0,3):
+		line[x] = [0,x]
+
+	line[0][0] = v0
 
 	skip_next = False
 	while True:
@@ -102,6 +107,7 @@ def multiple_impulses():
 					# is a collsion
 					other_i = int(h)
 					h = line[i][1] # remove prev vel contrib to ensure stay in same pixel
+					v = line[i][0] 
 					# swap vels
 					v, line[other_i][0] = line[other_i][0] * cor, v * cor
 
