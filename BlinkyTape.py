@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 """BlinkyTape Python communication library.
 
   This code assumes stock serialLoop() in the firmware.
@@ -13,6 +15,8 @@
 
 import serial
 import os.path
+import subprocess
+import re
 
 # For Python3 support- always run strings through a bytes converter
 import sys
@@ -27,7 +31,6 @@ else:
 
 class BlinkyTape(object):
     linux_port     = '/dev/ttyACM0'
-    windows_port   = 'COM5'
     min_colour_val = 0
     max_colour_val = 254
 
@@ -64,8 +67,17 @@ class BlinkyTape(object):
             return port
         elif os.path.exists( self.linux_port ):
             return self.linux_port
-        else: 
-            return self.windows_port
+        elif os.name == 'nt': # covers all windows machines?
+            cmd = "wmic path Win32_SerialPort Where 'Caption like \"%" + "BlinkyTape%\"' Get DeviceID" # Clumsy, but can't work out how else to avoid %B going weird
+            com_name_output = subprocess.check_output(cmd)
+            m = re.search( '(COM\d+)', com_name_output)
+            if m == None:
+                raise RuntimeError("Assuming this is a Windows machine, cannot find a matching COM port for BlinkyTape. Is it connected?")
+            else:
+                com_name = m.group(0)
+                return com_name
+        else:
+            raise RuntimeError("Cannot establish what kind OS is running, so don't know where to look for the BlinkyTape connection.")
 
     def send_list(self, colors):
         if len(colors) > self.ledCount:
