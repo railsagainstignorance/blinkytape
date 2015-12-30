@@ -17,6 +17,7 @@ import serial
 import os.path
 import subprocess
 import re
+from time import sleep
 
 # For Python3 support- always run strings through a bytes converter
 import sys
@@ -30,7 +31,6 @@ else:
 
 
 class BlinkyTape(object):
-    linux_port     = '/dev/ttyACM0'
     min_colour_val = 0
     max_colour_val = 254
 
@@ -55,6 +55,7 @@ class BlinkyTape(object):
 
         """
         self.port = self.__identify_port(port)
+        print "port=%s" % self.port
         self.ledCount = ledCount
         self.position = 0
         self.buffered = buffered
@@ -190,17 +191,16 @@ if __name__ == "__main__":
 
     (options, args) = parser.parse_args()
 
-    if options.portname is not None:
-        port = options.portname
-    else:
-        serialPorts = glob.glob("/dev/cu.usbmodem*")
-        port = serialPorts[0]
-
-    bt = BlinkyTape(port, options.ledcount, options.buffered)
+    bt = BlinkyTape(options.portname, options.ledcount, options.buffered)
 
     while True:
         bt.displayColor(255, 0, 0)
+        sleep(0.5)
         bt.displayColor(0, 255, 0)
+        sleep(0.5)
         bt.displayColor(0, 0, 255)
+        sleep(0.5)
         bt.displayColor(255, 255, 255)
+        sleep(0.5)
         bt.displayColor(0, 0, 0)
+        sleep(0.5)
