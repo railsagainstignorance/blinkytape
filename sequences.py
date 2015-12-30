@@ -17,8 +17,6 @@ def shuttle_extend(n=1):
 			for t in range(s+1):
 				pixel_list = map(lambda x: pixel_random_on if x<=t else pixel_off, range(led_count))
 				bb.send_list(pixel_list)
-
-	#		pixel_random_on = [randint(0,rgb_max), randint(0,rgb_max), randint(0,rgb_max)]
 			for t in range(s, -1, -1):
 				pixel_list = map(lambda x: pixel_random_on if x<=t else pixel_off, range(led_count))
 				bb.send_list(pixel_list)
@@ -45,7 +43,7 @@ def kitt_eye_sequence():
 	for s in range(led_count -1, -1, -1):
 		kitt_eye(led_count - s)
 
-def impulse():
+def impulse(max_loops=2000):
 	bb.clear_all()
 	v0 = 0.5 # keep v < 1.0
 	h0 = 0
@@ -53,9 +51,11 @@ def impulse():
 	g  = -0.0025
 	cor = 0.99
 
+	loop = 0
 	v=v0
 	h=h0
-	while True:
+	while loop<=max_loops:
+		loop += 1
 		h = h + v
 		v = v + g
 		if h<0:
@@ -69,7 +69,7 @@ def impulse():
 		pixel_list = map(lambda x: pixel_half_on if (led_count-int(h))==x else pixel_off, range(led_count))
 		bb.send_list(pixel_list)
 
-def multiple_impulses():
+def multiple_impulses(max_loops=2000, num_particles=5):
 	bb.clear_all()
 	v0 = 0.5 # keep v < 1.0
 	h0 = 0
@@ -77,17 +77,15 @@ def multiple_impulses():
 	g  = -0.0025
 	cor = 0.99	
 	line = 	[None] * led_count # [ None, None, [vel, height], None, None, [vel, height], ...]
-	# line[0] = [v0, h0]
-	# line[led_count -1] = [0,led_count -1]
-	# line[10] = [0,10]
 
-	for x in xrange(0,3):
-		line[x] = [0,x]
+	for x in range(num_particles): # prime it with particles
+		h = randint(0,max_h-1)
+		line[h] = [0,h]
 
-	line[0][0] = v0
-
+	loop = 0
 	skip_next = False
-	while True:
+	while loop <= max_loops:
+		loop += 1
 		for i in range(len(line)):
 			if line[i] is None or skip_next:
 				skip_next = False
@@ -121,13 +119,11 @@ def multiple_impulses():
 					line[i+1] = vh
 					line[i] = None
 					skip_next = True
-
 		pixel_list = map(lambda x: pixel_half_on if (x is not None) else pixel_off, reversed(line))
 		bb.send_list(pixel_list)
 			
-
 while True:
-	multiple_impulses()
 	impulse()
 	shuttle_extend()
+	multiple_impulses()
 	kitt_eye_sequence()
