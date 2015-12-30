@@ -1,4 +1,9 @@
-# BlinkyTape Python
-Python library and usage examples for [BlinkyTape](http://blinkinlabs.com/blinkytape/) (RGB LED strip with integrated USB controller)
+# BlinkyTape Python Animation Sequences
 
-![BlinkyTape](http://wordpress.blinkinlabs.com/wp-content/uploads/2014/07/bt_splash.jpg)
+Playing with BlinkyTape, an RGB LED strip with integrated USB controller.
+
+Code was borrowed wholesale from BlinkinLabs' [Python library and example for the BlinkyTape](https://github.com/Blinkinlabs/BlinkyTape_Python)
+
+Based on [painful connection lessons learned](http://upthebuzzard.tumblr.com/post/136270814260/connecting-to-blinkytape-using-python-on-raspberry), BlinkyTape.py has been tweaked to (try and) auto-detect the port/device name via which BlinkyTape has been connected - encapsulated in private method __identify_port.
+
+Some simple animations have been created in sequences.py.
