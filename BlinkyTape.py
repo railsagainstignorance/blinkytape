@@ -65,17 +65,23 @@ class BlinkyTape(object):
     def __identify_port(self, port=None):
         if port is not None:
             return port
-        elif os.path.exists( self.linux_port ):
-            return self.linux_port
+        elif os.name == 'posix': # covers all *nix machines, including Linux?
+            if not os.path.exists( '/dev/serial') or not os.path.exists('/dev/serial/by-id'):
+                raise RuntimeError("Assuming this is a *nix machine, cannot find the device path for BlinkyTape via 'ls -l /dev/serial/by-id'. Is it connected?")
+            ls_l_output = subprocess.check_output('ls -l /dev/serial/by-id')
+            m = re.search( 'BlinkyTape\S+\s+->\s+\S+(/tty\S+)', ls_l_output)
+            if m == None:
+                raise RuntimeError("Assuming this is a *nix machine, cannot find the device path for BlinkyTape via 'ls -l /dev/serial/by-id'. Is it connected?")
+            device_path = '/dev' + m.group(0)
+            return device_path
         elif os.name == 'nt': # covers all windows machines?
             cmd = "wmic path Win32_SerialPort Where 'Caption like \"%" + "BlinkyTape%\"' Get DeviceID" # Clumsy, but can't work out how else to avoid %B going weird
             com_name_output = subprocess.check_output(cmd)
             m = re.search( '(COM\d+)', com_name_output)
             if m == None:
                 raise RuntimeError("Assuming this is a Windows machine, cannot find a matching COM port for BlinkyTape. Is it connected?")
-            else:
-                com_name = m.group(0)
-                return com_name
+            com_name = m.group(0)
+            return com_name
         else:
             raise RuntimeError("Cannot establish what kind OS is running, so don't know where to look for the BlinkyTape connection.")
 
