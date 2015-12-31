@@ -76,17 +76,17 @@ def multiple_impulses(max_loops=2000, num_particles=5):
 	max_h = 60
 	g  = -0.0025
 	cor = 0.99	
-	line = 	[None] * led_count # [ None, None, [vel, height], None, None, [vel, height], ...]
+	line = 	[None] * led_count # to hold all the particles and empty spaces: [ None, None, [vel, height], None, ..., None, [vel, height], ...]
 
-	for x in range(num_particles): # prime it with particles
+	for x in range(num_particles): # prime it with particles, each with [velocity,height]
 		h = randint(0,max_h-1)
 		line[h] = [0,h]
 
 	loop = 0
 	skip_next = False
-	while loop <= max_loops:
+	while loop <= max_loops:  
 		loop += 1
-		for i in range(len(line)):
+		for i in range(len(line)): # scan from low to high, adjusting one pixel at a time.
 			if line[i] is None or skip_next:
 				skip_next = False
 			else:
@@ -94,31 +94,30 @@ def multiple_impulses(max_loops=2000, num_particles=5):
 				h = line[i][1]
 				h = h + v
 				v = v + g
-				if h<0:
+				if h<0: # bounce off bottom
 					v = -v * cor
 					h = h + v
 					v = v + g
-				elif h>max_h:
+				elif h>max_h: # stop at top
 					v = 0
 					h = max_h
-				elif (int(h) != i) and (line[int(h)] is not None):
-					# is a collsion
+				elif (int(h) != i) and (line[int(h)] is not None): # is a collsion
 					other_i = int(h)
 					h = line[i][1] # remove prev vel contrib to ensure stay in same pixel
 					v = line[i][0] 
-					# swap vels
+					# swap vels (simple physics of direct elastic collision between two identical objects)
 					v, line[other_i][0] = line[other_i][0] * cor, v * cor
 
 				vh = [v,h]
-				if int(h) == i:
+				if int(h) == i: # stays in same pixel
 					line[i] = vh
-				elif int(h) < i:
+				elif int(h) < i: # moves down
 					line[i-1] = vh
 					line[i] = None
-				else:
+				else:             # moves up
 					line[i+1] = vh
 					line[i] = None
-					skip_next = True
+					skip_next = True # don't recalc its position in this sweep
 		pixel_list = map(lambda x: pixel_half_on if (x is not None) else pixel_off, reversed(line))
 		bb.send_list(pixel_list)
 			
