@@ -79,6 +79,10 @@ class BlinkyTape(object):
             cmd = "wmic path Win32_SerialPort Where 'Caption like \"%" + "BlinkyTape%\"' Get DeviceID" # Clumsy, but can't work out how else to avoid %B going weird
             com_name_output = subprocess.check_output(cmd)
             m = re.search( '(COM\d+)', com_name_output)
+            if m == None: # but in Windows 10, the name BlinkyTape does not seem to appear, so just look for any device at all. Assuming this might fail if you have more than one device attached. Sorry. I hate the wmic thing.
+                cmd2 = "wmic path Win32_SerialPort Get DeviceID"
+                com_name_output2 = subprocess.check_output(cmd2)
+                m = re.search( '(COM\d+)', com_name_output2)
             if m == None:
                 raise RuntimeError("Assuming this is a Windows machine, cannot find a matching COM port for BlinkyTape. Is it connected?")
             com_name = m.group(1)
