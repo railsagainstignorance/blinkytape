@@ -80,7 +80,8 @@ class BlinkyTape(object):
             com_name_output = subprocess.check_output(cmd)
             m = re.search( '(COM\d+)', com_name_output)
             if m == None: # but in Windows 10, the name BlinkyTape does not seem to appear, so just look for any device at all. Assuming this might fail if you have more than one device attached. Sorry. I hate the wmic thing.
-                cmd2 = "wmic path Win32_SerialPort Get DeviceID"
+                #cmd2 = "wmic path Win32_SerialPort Get DeviceID"
+                cmd2 = "wmic path Win32_SerialPort Where 'PNPDeviceID like \"%" + "USB%\"' Get DeviceID"
                 com_name_output2 = subprocess.check_output(cmd2)
                 m = re.search( '(COM\d+)', com_name_output2)
             if m == None:
